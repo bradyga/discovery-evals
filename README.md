@@ -10,12 +10,21 @@ programmatic verifier, and inputs pinned by identifier and checksum so a
 run is reproducible from a clean machine. A task passes or fails on the
 verifier, not on inspection.
 
-## Layout
+## Directory contract
 
 ```
-tasks/      one directory per task
-tests/      tests for shared repo tooling
+tasks/<id>/
+  spec.md        Intent / Prompt + assumptions / Verifier
+  verify.py      the task's verifier
+  notes.md       accession checks, licences, retrieval dates
+  env.yaml       pinned per-task environment
+  inputs/        frozen data
+
+tests/           harness-level tests only
 ```
+
+A task's verifier lives in that task's own directory, because it ships as
+part of the task. Root `tests/` covers shared repo tooling and nothing else.
 
 ## Environments
 
@@ -28,7 +37,7 @@ uv run ruff check .
 ```
 
 The repo root declares no runtime dependencies. Scientific packages are
-declared and pinned per task, in that task's own directory, and are not
+declared and pinned per task in that task's `env.yaml`, and are not
 installed speculatively at the root.
 
 ## License
