@@ -1,0 +1,46 @@
+# Agent and assistant context — never tracked, never shipped in a trace
+CLAUDE.md
+.claude/
+AGENTS.md
+.cursor/
+.aider*
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Environments — per-task, created locally, never committed
+.venv/
+venv/
+.env
+.env.*
+
+# uv
+# uv.lock IS tracked: pinned environments are the point of this repo.
+.uv/
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+.coverage
+htmlcov/
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Scratch
+scratch/
+tmp/
+*.log
