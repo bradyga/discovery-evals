@@ -1,0 +1,33 @@
+[project]
+name = "discovery-evals"
+version = "0.0.0"
+description = "Reproducible benchmarks and verifiers for computational chemistry and structure-based modelling, with pinned public inputs."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [{ name = "Brady Garabato", email = "bdgara@gmail.com" }]
+
+# No runtime dependencies at the repo root, by design.
+# Each task declares and pins its own environment; the scientific stack is
+# never installed speculatively here.
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
