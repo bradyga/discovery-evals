@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: discovery-evals
+abstract: >-
+  Reproducible benchmarks and verifiers for computational chemistry
+  and structure-based modelling, with pinned public inputs.
+type: software
+authors:
+  - family-names: Garabato
+    given-names: Brady
+    orcid: "https://orcid.org/0000-0002-1180-3824"
+license: MIT
+repository-code: "https://github.com/bradyga/discovery-evals"
