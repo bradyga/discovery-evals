@@ -1,0 +1,19 @@
+Read spec.md first. It states two functional forms, the calibration that puts
+them on a common footing, and the criterion you are to decide under. The
+criterion is fixed: it is not yours to choose, and not yours to change.
+
+Implement both forms behind the interface spec.md names, so that each runs on
+the configuration in config/. Establish that the two forms are not equivalent —
+not that they differ numerically at the pinned parameters, but that no choice of
+parameters makes one into the other.
+
+Then evaluate the criterion and defend a choice. "Defend" means the argument
+runs on the numbers your own implementation produces. That one of the two forms
+is the more commonly used is not a reason, and a report that leans on it fails
+whether or not it names the same form the criterion does. If the criterion does
+not decide, say so and say what would.
+
+Where the specification leaves something underdetermined, say so explicitly
+rather than picking a convention silently.
+
+verify.py is in this directory. You may run it. Do not edit it.
