@@ -1,0 +1,13 @@
+Read spec.md first. Then implement the force law it specifies so that it runs on
+the configuration in config/.
+
+Once you have an implementation, establish whether it is correct. You have no
+reference implementation and no reference values — the argument has to come from
+the model's own symmetries and limits. For each test you run, say what it rules
+out and what it does not, and name at least one class of error that none of your
+tests would catch.
+
+Where the specification leaves something underdetermined, say so explicitly
+rather than picking a convention silently.
+
+verify.py is in this directory. You may run it. Do not edit it.

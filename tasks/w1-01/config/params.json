@@ -1,0 +1,14 @@
+{
+ "format": "w1-01/params/1",
+ "units": "reduced Lennard-Jones (lengths in sigma_AA, energies in eps_AA, forces in eps_AA/sigma_AA)",
+ "species_encoding": {"0": "A", "1": "B"},
+ "n_osc": 3,
+ "epsilon": [[1.0, 0.8], [0.8, 1.2]],
+ "sigma": [[1.0, 1.05], [1.05, 1.1]],
+ "lj_switch": {"r_on": 2.2, "r_off": 2.8},
+ "coord_switch": {"r_on": 1.2, "r_off": 1.6},
+ "omega0": 1.0,
+ "alpha": 0.8,
+ "n0": 3.0,
+ "m_osc": [1.0, 1.6]
+}
