@@ -259,13 +259,26 @@ def check_0_contract(module, positions, species, xi, params):
     else:
         c.record("max |sum(terms) - F| / max|F|", "n/a — the forces are zero", fmt="{}")
 
-    # parameters must be read from `params`, not hard-coded
-    scaled = json.loads(json.dumps(params))
-    scaled["epsilon"] = [[1.5 * v for v in row] for row in params["epsilon"]]
-    e_scaled, _ = call_ef(module, positions, species, xi, scaled, where="with epsilon scaled")
-    responds = abs(e_scaled - energy) > 1e-12 * max(1.0, abs(energy))
-    c.record("energy responds to params['epsilon']", responds, ok=responds, fmt="{}")
-    c.require(responds, "the implementation ignores params: parameters appear to be hard-coded")
+    # Parameters must be read from `params`, not hard-coded.  Every parameter
+    # that carries a scale is perturbed on its own and the energy must respond
+    # to each: one that is ignored can be hard-coded at its pinned value and
+    # would then satisfy the limiting-case identity of check 4 for free.
+    for key, mutate in (
+        ("epsilon", lambda q: [[1.5 * v for v in row] for row in q["epsilon"]]),
+        ("omega0", lambda q: 1.5 * float(q["omega0"])),
+        ("m_osc", lambda q: [1.5 * float(q["m_osc"][0]), 0.5 * float(q["m_osc"][1])]),
+    ):
+        scaled = json.loads(json.dumps(params))
+        scaled[key] = mutate(params)
+        e_scaled, _ = call_ef(
+            module, positions, species, xi, scaled, where=f"with params['{key}'] perturbed"
+        )
+        responds = abs(e_scaled - energy) > 1e-12 * max(1.0, abs(energy))
+        c.record(f"energy responds to params['{key}']", responds, ok=responds, fmt="{}")
+        c.require(
+            responds,
+            f"the implementation ignores params['{key}']: it appears to be hard-coded",
+        )
 
     return c, energy, forces, terms
 
@@ -422,19 +435,40 @@ def check_4_limits(module, positions, species, xi, params, energy, rng):
     c.record("alpha independence at xi = 0", d, ok=d <= TOL_LIMIT)
     c.require(d <= TOL_LIMIT, "at xi = 0 the energy still depends on alpha")
 
-    omega0 = float(params["omega0"])
-    m_osc = np.asarray(params["m_osc"], dtype=np.float64)
-    expected = 0.5 * float((m_osc[species] * (xi * xi).sum(axis=1)).sum()) * (0.5 * omega0) ** 2
-    got = e_a0 - e_x0a0
-    d = abs(got - expected) / max(abs(expected), 1.0)
-    c.record("alpha=0: stiffness energy, closed form", expected)
-    c.record("alpha=0: stiffness energy, measured", got)
-    c.record("relative deviation", d, ok=d <= TOL_LIMIT)
-    c.require(
-        d <= TOL_LIMIT,
-        "at alpha = 0 the stiffness energy does not equal "
-        "(1/2) (omega0/2)^2 sum_i m_i sum_g xi_ig^2",
+    # The stiffness energy at alpha = 0 must equal its stated closed form, and
+    # must go on doing so when omega0 and m_osc are moved off their pinned
+    # values.  At the pinned values alone the identity is satisfied by any
+    # implementation that hard-codes them; across the three settings it is not,
+    # and neither is one whose stiffness term carries a wrong constant factor.
+    xi2 = (xi * xi).sum(axis=1)
+    pinned_w0 = float(params["omega0"])
+    pinned_m = [float(v) for v in params["m_osc"]]
+    settings = (
+        ("pinned", pinned_w0, pinned_m),
+        ("omega0 x 1.5", 1.5 * pinned_w0, pinned_m),
+        ("m_osc perturbed", pinned_w0, [1.5 * pinned_m[0], 0.5 * pinned_m[1]]),
     )
+    for label, w0, m in settings:
+        q = json.loads(json.dumps(params))
+        q["alpha"] = 0.0
+        q["omega0"] = w0
+        q["m_osc"] = m
+        e_q, _ = call_ef(module, positions, species, xi, q, where=f"at alpha = 0, {label}")
+        e_q0, _ = call_ef(
+            module, positions, species, zeros, q, where=f"at alpha = 0, xi = 0, {label}"
+        )
+        m_arr = np.asarray(m, dtype=np.float64)
+        expected = 0.5 * float((m_arr[species] * xi2).sum()) * (0.5 * w0) ** 2
+        got = e_q - e_q0
+        d = abs(got - expected) / max(abs(expected), 1.0)
+        c.record(f"alpha=0, {label}: stiffness energy, closed form", expected)
+        c.record(f"alpha=0, {label}: stiffness energy, measured", got)
+        c.record(f"alpha=0, {label}: relative deviation", d, ok=d <= TOL_LIMIT)
+        c.require(
+            d <= TOL_LIMIT,
+            f"at alpha = 0 with {label} the stiffness energy does not equal "
+            "(1/2) (omega0/2)^2 sum_i m_i sum_g xi_ig^2",
+        )
 
     # the pinned alpha must not itself be degenerate
     non_degenerate = abs(e_a0 - energy) > 1e-9 * max(abs(energy), 1.0)
