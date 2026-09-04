@@ -15,16 +15,24 @@ verifier, not on inspection.
 ```
 tasks/<id>/
   spec.md        Intent / Prompt + assumptions / Verifier
+  prompt.txt     the session's first user turn, verbatim
   verify.py      the task's verifier
-  notes.md       accession checks, licences, retrieval dates
+  notes.md       provenance, licences, retrieval dates, checksums
   env.yaml       pinned per-task environment
-  inputs/        frozen data
+  config/        pinned inputs: frozen data and parameters
+  refs/          citations: DOIs, licences, fetch notes
 
 tests/           harness-level tests only
 ```
 
 A task's verifier lives in that task's own directory, because it ships as
 part of the task. Root `tests/` covers shared repo tooling and nothing else.
+
+`config/` and `refs/` are separate because they are different kinds of thing.
+`config/` is data the task is run on, pinned and checksummed. `refs/` points at
+sources outside the tree and holds no data: a source that may not be
+redistributed is cited there by DOI, and one that may be is still cited rather
+than bundled unless the task needs the file itself.
 
 ## Environments
 
